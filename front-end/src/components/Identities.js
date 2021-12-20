@@ -14,6 +14,7 @@ class Identities extends React.Component{
 
     }
 
+    /*ajax request to recup (with get) list of identities*/
     componentDidMount(){
 
         axios.get('/identity')
@@ -41,9 +42,23 @@ class Identities extends React.Component{
 
     }
 
+    /*ajax request to delete Identity with id*/
     deleteIdentity(id) {
         axios.delete(`/identity/${id}`)
         return this.componentDidMount()
+    }
+
+    /*transformation of arrays to String*/
+    arrayToString(value) {
+        let newValue = '';
+        if(value === undefined) return newValue;
+        value.forEach((e, i) => {
+            if(i !== 0) {
+                newValue += ",";
+            }
+            newValue+=e;
+        })
+        return newValue;
     }
 
     render(){
@@ -60,33 +75,38 @@ class Identities extends React.Component{
             //render this part of code if we received the data from the server
         } else {
             return(
-                <div>
+                <section id="center">
                     <table>
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Surname</th>
-                            <th>Age</th>
-                            <th>Origins</th>
-                            <th>Height</th>
-                            <th>isAuth</th>
-                        </tr>
+                            <tr>
+                                {/*Let see the length of entity list*/}
+                                <th>ID | length of {identities.length} entities</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Age</th>
+                                <th>Origins</th>
+                                <th>Height</th>
+                                <th>isAuth</th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                         </thead>
 
                         <tbody>
+                        {/*Listing of identities with map*/}
                         {identities.map(identity => (
                             <tr key={identity._id}>
                                 <td>{identity._id}</td>
                                 <td>{identity.name}</td>
                                 <td>{identity.surname}</td>
                                 <td>{identity.age}</td>
-                                <td>{identity.origins}</td>
+                                <td>{this.arrayToString(identity.origins)}</td>
                                 <td>{identity.height}</td>
                                 <td >{identity.isAuth? 'Yes' : 'No'}</td>
-                                {/* link to view a single dog details by ID  */}
+                                {/* link to view a single identity details by ID  */}
                                 <td><Link to={`/viewIdentity?id=${identity._id}`}>View</Link></td>
-                                {/* link to view and edit the dog details by ID */}
+                                {/* link to view and edit the identity details by ID */}
                                 <td><Link to={`/editIdentity?id=${identity._id}`}>Edit</Link></td>
                                 <td>
                                     <button onClick={this.deleteIdentity.bind(this, identity._id)}>Delete</button>
@@ -95,7 +115,9 @@ class Identities extends React.Component{
                         ))}
                         </tbody>
                     </table>
-                </div>
+                    {/*link to adding route*/}
+                    <Link className="link" to={"/addIdentity"}>Add an Identity</Link>
+                </section>
             )
         }
     }

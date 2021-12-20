@@ -13,6 +13,7 @@ class IdentityView extends React.Component{
         }
     }
 
+    /*ajax request to recup (with get) identity*/
     componentDidMount(){
 
         axios.get(`/identity/${this.id}`)
@@ -38,9 +39,23 @@ class IdentityView extends React.Component{
             })
     }
 
+    /*ajax request to delete Identity with id*/
     deleteIdentity(id) {
         axios.delete(`/identity/${id}`)
         window.location.href=('/');
+    }
+
+    /*transformation of arrays to String*/
+    arrayToString(value) {
+        let newValue = '';
+        if(value === undefined) return newValue;
+        value.forEach((e, i) => {
+            if(i !== 0) {
+                newValue += ",";
+            }
+            newValue+=e;
+        })
+        return newValue;
     }
 
     render(){
@@ -57,18 +72,20 @@ class IdentityView extends React.Component{
             //render this part of code if we received the data from the server
         } else {
             return (
-                <div>
+                <section id="center">
                     <table>
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Surname</th>
-                            <th>Age</th>
-                            <th>Origins</th>
-                            <th>Height</th>
-                            <th>isAuth</th>
-                        </tr>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Surname</th>
+                                <th>Age</th>
+                                <th>Origins</th>
+                                <th>Height</th>
+                                <th>isAuth</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
                         </thead>
 
                         <tbody>
@@ -77,7 +94,7 @@ class IdentityView extends React.Component{
                             <td>{identity.name}</td>
                             <td>{identity.surname}</td>
                             <td>{identity.age}</td>
-                            <td>{identity.origins}</td>
+                            <td>{this.arrayToString(identity.origins)}</td>
                             <td>{identity.height}</td>
                             <td >{identity.isAuth? 'Yes' : 'No'}</td>
                             {/* link to view and edit the identity details by ID */}
@@ -88,7 +105,9 @@ class IdentityView extends React.Component{
                         </tr>
                         </tbody>
                     </table>
-                </div>
+                    {/*link to identities route*/}
+                    <Link className="link" to={"/"}>List of Identities</Link>
+                </section>
             )
         }
     }

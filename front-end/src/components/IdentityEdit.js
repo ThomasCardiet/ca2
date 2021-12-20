@@ -2,19 +2,22 @@
 
 import React from 'react';
 import axios from "axios";
+import {Link} from "react-router-dom";
 
 class IdentityEdit extends React.Component{
     constructor(props){
         super(props);
+        /*To get url id param*/
         this.id = window.location.href.split('=')[1]
         this.state = {
             identity: {},
             isLoaded: true
         }
-        this.handleChange = this.handleChange.bind(this)
-        this.handleSubmit = this.handleSubmit.bind(this)
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    /*ajax request to recup (with get) list of identities*/
     componentDidMount(){
 
         axios.get(`/identity/${this.id}`)
@@ -40,29 +43,39 @@ class IdentityEdit extends React.Component{
             })
     }
 
-    transformValue(value){
-        let newValue = null;
-        switch (typeof value) {
-            case "object":
-                newValue = '';
-                value.forEach(e => {
-                    if(newValue.length>0) {
-                        newValue+=',';
-                    }
-                    newValue+=e;
-                })
-                break;
-        }
-        return newValue;
-    }
-
+    /*Function called when any input of form is change (with option onChange)*/
     handleChange(event) {
-        //this.setState({identity: event.target.value});
+        let object = this.state.identity;
+        /*Update of input value with name*/
+        object[event.target.name] = event.target.value;
+        /*Update of state*/
+        this.setState({
+            identity: object,
+            isLoaded: true
+        });
     }
 
     handleSubmit(event) {
-        this.setState({identity: event})
         event.preventDefault()
+        {/*Construct Url Search Params to send to API*/}
+        const params = new URLSearchParams()
+        params.append('name', this.state.identity.name)
+        params.append('surname', this.state.identity.surname)
+        params.append('age', this.state.identity.age)
+        params.append('height', this.state.identity.height)
+        params.append('origins', this.state.identity.origins)
+        params.append('isAuth', this.state.identity.isAuth)
+        axios.put(`/identity/${this.id}`, params )
+            .then((response) => {
+                /*If success redirection to List of identities*/
+                window.location.href=('/');
+
+            })
+            .catch((error)=> {
+                /*If error send to console*/
+                console.log(error)
+
+            })
     }
 
     render(){
@@ -79,43 +92,45 @@ class IdentityEdit extends React.Component{
             //render this part of code if we received the data from the server
         } else {
             return (
-                <div>
+                <section id="center-form">
+                    <h2 id="form-title">Update of Identity</h2>
+                    {/*Call function when form is submit*/}
                     <form onSubmit={this.handleSubmit}>
-                        <label htmlFor="name">
+                        <label>
                             Name:
-                            <input id="name" type="text" value={identity.name}/>
+                            <input name="name" type="text" value={identity.name} onChange={this.handleChange}/>
                         </label>
-
-                        <label htmlFor="surname">
+                        <br/>
+                        <label>
                             Surname:
-                            <input id="surname" type="text" value={identity.surname}/>
+                            <input name="surname" type="text" value={identity.surname} onChange={this.handleChange}/>
                         </label>
-
-
-                        <label htmlFor="age">
+                        <br/>
+                        <label>
                             Age:
-                            <input id="age" type="number" value={identity.age}/>
+                            <input name="age" type="number" value={identity.age} onChange={this.handleChange}/>
                         </label>
-
-                        <label htmlFor="height">
+                        <br/>
+                        <label>
                             Height:
-                            <input id="height" type="text" value={identity.height}/>
+                            <input name="height" type="number" step="0.1" value={identity.height} onChange={this.handleChange}/>
                         </label>
-
-                        <label htmlFor="origins">
+                        <br/>
+                        <label>
                             Origins:
-                            <input id="origins" type="text" value={this.transformValue(identity.origins)}/>
+                            <textarea name="origins" defaultValue={identity.origins} onChange={this.handleChange} placeholder="type origins separate with ','"/>
                         </label>
-
-                        <label htmlFor="isAuth">
+                        <br/>
+                        <label>
                             isAuth:
-                            <input id="isAuth" type="checkbox" checked={identity.isAuth}/>
+                            <input name="isAuth" type="text" value={identity.isAuth} onChange={this.handleChange} placeholder="true or false"/>
                         </label>
-
-                        <input type="submit" value="Envoyer" />
-
+                        <br/>
+                        <input className="button"  type="submit" value="Send" />
                     </form>
-                </div>
+                    {/*link to identities route*/}
+                    <Link className="link" to={"/"}>List of Identities</Link>
+                </section>
             )
         }
     }
